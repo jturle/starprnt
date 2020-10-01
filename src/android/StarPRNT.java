@@ -49,7 +49,9 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.Log;
+
 import android.util.Base64;
+import android.graphics.ImageDecoder;
 
 
 
@@ -623,9 +625,12 @@ public class StarPRNT extends CordovaPlugin {
                         Uri imageUri = null;
                         Bitmap bitmap = null;
                         try {
-                            imageUri =  Uri.parse(uriString);
-                            bitmap = MediaStore.Images.Media.getBitmap(contentResolver, imageUri);
-                        } catch (IOException e) {
+                            // Switch it to jpg, even if it is a PNG?? Weird.
+                            String cleanImage = uriString.replace("data:image/png;base64,", "").replace("data:image/jpeg;base64,","");
+                            imageUri =  Uri.parse(cleanImage);
+                            byte[] imageBytes = Base64.decode(cleanImage, Base64.DEFAULT);
+                            bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                        } catch (Exception e) {
                             _callbackContext.error(e.getMessage());
                         }
 
